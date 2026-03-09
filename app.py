@@ -4,11 +4,21 @@ from models import db, User, Client, Projet, MaterielDevis
 
 app = Flask(__name__)
 
-# Configuration pour Render et SQLite
-base_dir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(base_dir, 'elec_pro.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Nouveau bloc à coller à la place
 app.config['SECRET_KEY'] = 'cle_secrete_ernest_2026'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Cette partie vérifie si on est sur Render ou en local
+if os.environ.get('RENDER'):
+    # Sur Render, on utilise le dossier /tmp qui autorise l'écriture
+    db_path = os.path.join('/tmp', 'elec_pro.db')
+else:
+    # En local (Termux/PC), on reste dans le dossier du projet
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    db_path = os.path.join(base_dir, 'elec_pro.db')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+
 
 db.init_app(app)
 
