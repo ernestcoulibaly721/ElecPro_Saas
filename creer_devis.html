@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Devis pour : {{ client.nom_complet }}</h2>
+<form method="POST" class="mb-4">
+    <input type="text" name="designation" placeholder="Matériel (ex: Prise 2P+T)" required>
+    <input type="number" name="quantite" placeholder="Qté" required>
+    <input type="number" step="0.01" name="prix_unitaire" placeholder="Prix Unit." required>
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Désignation</th>
+            <th>Qté</th>
+            <th>PU</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in materiels %}
+        <tr>
+            <td>{{ m.designation }}</td>
+            <td>{{ m.quantite }}</td>
+            <td>{{ m.prix_unitaire }} FCFA</td>
+            <td>{{ m.quantite * m.prix_unitaire }} FCFA</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h4 class="text-end">TOTAL GÉNÉRAL : {{ total }} FCFA</h4>
+{% endblock %}
