@@ -45,7 +45,7 @@ def ajouter_client():
         db.session.add(nouveau)
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('ajouter_client.html')
+    return render_template('Ajouter_client.html')
 
 @app.route('/devis/<int:client_id>', methods=['GET', 'POST'])
 def creer_devis(client_id):
