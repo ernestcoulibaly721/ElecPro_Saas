@@ -12,6 +12,23 @@
         .btn-primary { background-color: var(--primary-color); border: none; color: black; font-weight: bold; }
         .card { border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     </style>
+<style>
+    @media print {
+        /* On cache la barre de navigation et les boutons lors de l'impression */
+        .navbar, .btn, footer, .btn-secondary {
+            display: none !important;
+        }
+        body {
+            background-color: white !important;
+        }
+        .container {
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
 </head>
 <body>
 
