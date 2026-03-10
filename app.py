@@ -4,11 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# --- CONFIGURATION DE LA BASE DE DONNÉES ---
-app.config['SECRET_KEY'] = 'cle_secrete_ernest_elecpro_2026'
+# --- CONFIGURATION ---
+app.config['SECRET_KEY'] = 'cle_secrete_ernest_2026'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Gestion du chemin pour Render (dossier /tmp pour l'écriture)
 if os.environ.get('RENDER'):
     db_path = os.path.join('/tmp', 'elec_pro.db')
 else:
@@ -18,7 +17,13 @@ else:
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 db = SQLAlchemy(app)
 
-# --- MODÈLES (BASE DE DONNÉES) ---
+# --- MODÈLES ---
+class Profil(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nom_entreprise = db.Column(db.String(100), default="Mon Entreprise Élec")
+    gerant = db.Column(db.String(100), default="Nom du Gérant")
+    telephone = db.Column(db.String(20), default="+226 XX XX XX XX")
+
 class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nom_complet = db.Column(db.String(100), nullable=False)
@@ -33,56 +38,60 @@ class MaterielDevis(db.Model):
     prix_unitaire = db.Column(db.Float, nullable=False)
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
 
-# Création des tables au démarrage
 with app.app_context():
     db.create_all()
 
-# --- ROUTES (LOGIQUE) ---
-
+# --- ROUTES ---
 @app.route('/')
 def index():
-    tous_les_clients = Client.query.all()
-    return render_template('index.html', clients=tous_les_clients, total_clients=len(tous_les_clients))
+    clients = Client.query.all()
+    return render_template('index.html', clients=clients)
 
 @app.route('/ajouter_client', methods=['GET', 'POST'])
 def ajouter_client():
     if request.method == 'POST':
-        nom = request.form.get('nom_complet')
-        tel = request.form.get('telephone')
-        adr = request.form.get('adresse')
-        
-        nouveau_client = Client(nom_complet=nom, telephone=tel, adresse_chantier=adr)
-        db.session.add(nouveau_client)
+        nouveau = Client(
+            nom_complet=request.form.get('nom_complet'),
+            telephone=request.form.get('telephone'),
+            adresse_chantier=request.form.get('adresse')
+        )
+        db.session.add(nouveau)
         db.session.commit()
         return redirect(url_for('index'))
-    
-    # Rappel : le fichier sur GitHub doit s'appeler exactement comme ici
     return render_template('Ajouter_client.html')
 
 @app.route('/creer_devis/<int:client_id>', methods=['GET', 'POST'])
 def creer_devis(client_id):
     client = Client.query.get_or_404(client_id)
-    
+    profil = Profil.query.first() or Profil()
     if request.method == 'POST':
-        desig = request.form.get('designation')
-        qte = int(request.form.get('quantite'))
-        prix = float(request.form.get('prix_unitaire'))
-        
-        nouvel_article = MaterielDevis(
-            designation=desig, 
-            quantite=qte, 
-            prix_unitaire=prix, 
+        item = MaterielDevis(
+            designation=request.form.get('designation'),
+            quantite=int(request.form.get('quantite')),
+            prix_unitaire=float(request.form.get('prix_unitaire')),
             client_id=client.id
         )
-        db.session.add(nouvel_article)
+        db.session.add(item)
         db.session.commit()
         return redirect(url_for('creer_devis', client_id=client.id))
-
-    # Calcul du total général du devis
-    materiels = MaterielDevis.query.filter_by(client_id=client.id).all()
-    total_general = sum(m.quantite * m.prix_unitaire for m in materiels)
     
-    return render_template('creer_devis.html', client=client, materiels=materiels, total=total_general)
+    total = sum(m.quantite * m.prix_unitaire for m in client.materiels)
+    return render_template('creer_devis.html', client=client, materiels=client.materiels, total=total, profil=profil)
+
+@app.route('/mon_profil', methods=['GET', 'POST'])
+def mon_profil():
+    profil = Profil.query.first()
+    if not profil:
+        profil = Profil()
+        db.session.add(profil)
+        db.session.commit()
+    if request.method == 'POST':
+        profil.nom_entreprise = request.form.get('nom_entreprise')
+        profil.gerant = request.form.get('gerant')
+        profil.telephone = request.form.get('telephone')
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('mon_profil.html', profil=profil)
 
 if __name__ == '__main__':
     app.run(debug=True)
