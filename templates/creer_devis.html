@@ -1,65 +1,104 @@
 {% extends "layout.html" %}
+
 {% block content %}
-<div class="container">
-    <div class="row mb-4 border-bottom pb-3">
-        <div class="col-6">
-            <h2 class="text-primary fw-bold text-uppercase">{{ profil.nom_entreprise }}</h2>
-            <p class="mb-0"><strong>Responsable :</strong> {{ profil.gerant }}</p>
-            <p><strong>Contact :</strong> {{ profil.telephone }}</p>
+<div class="container mt-3">
+    <div class="d-print-none mb-4">
+        <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary">← Retour à la liste</a>
+        <hr>
+    </div>
+
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-7 d-flex align-items-center">
+            <img src="https://i.ibb.co/B2Y48BbS/1000064766.png" 
+                 alt="Logo ÉlecPro" 
+                 style="max-height: 120px; width: auto; margin-right: 20px; border-radius: 8px; border: 1px solid #eee;">
+            
+            <div>
+                <h2 class="text-primary fw-bold text-uppercase mb-0">{{ profil.nom_entreprise }}</h2>
+                <p class="text-muted mb-1">Expert en Électricité Bâtiment</p>
+                <p class="mb-0 small"><strong>Gérant :</strong> {{ profil.gerant }}</p>
+                <p class="mb-0 small"><strong>Tél :</strong> {{ profil.telephone }}</p>
+            </div>
         </div>
-        <div class="col-6 text-end">
-            <h1 class="text-muted">DEVIS</h1>
-            <h5>Client : {{ client.nom_complet }}</h5>
-            <p>Chantier : {{ client.adresse_chantier }}</p>
+        <div class="col-md-5 text-end">
+            <h1 class="display-5 text-muted fw-light">DEVIS</h1>
+            <div class="mt-2">
+                <p class="mb-0"><strong>Client :</strong> {{ client.nom_complet }}</p>
+                <p class="mb-0"><strong>Lieu :</strong> {{ client.adresse_chantier }}</p>
+                <p class="mb-0"><strong>Date :</strong> 10 Mars 2026</p>
+            </div>
         </div>
     </div>
 
-    <div class="card mb-4 d-print-none border-primary">
+    <div class="card mb-4 border-primary d-print-none shadow-sm">
+        <div class="card-header bg-primary text-white">Ajouter du matériel</div>
         <div class="card-body">
             <form method="POST" class="row g-2">
-                <div class="col-md-5"><input type="text" name="designation" class="form-control" placeholder="Matériel" required></div>
-                <div class="col-md-2"><input type="number" name="quantite" class="form-control" placeholder="Qté" required></div>
-                <div class="col-md-3"><input type="number" step="0.1" name="prix_unitaire" class="form-control" placeholder="Prix (FCFA)" required></div>
-                <div class="col-md-2"><button class="btn btn-success w-100">Ajouter</button></div>
+                <div class="col-md-5">
+                    <input type="text" name="designation" class="form-control" placeholder="Désignation (ex: Câble 1.5mm)" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="quantite" class="form-control" placeholder="Qté" min="1" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" step="0.01" name="prix_unitaire" class="form-control" placeholder="Prix Unitaire (FCFA)" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success w-100">Ajouter</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Désignation</th>
-                <th>Quantité</th>
-                <th class="text-end">Prix Unitaire</th>
-                <th class="text-end">Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for m in materiels %}
-            <tr>
-                <td>{{ m.designation }}</td>
-                <td>{{ m.quantite }}</td>
-                <td class="text-end">{{ "{:,.0f}".format(m.prix_unitaire) }}</td>
-                <td class="text-end fw-bold">{{ "{:,.0f}".format(m.quantite * m.prix_unitaire) }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot class="table-light">
-            <tr>
-                <td colspan="3" class="text-end"><strong>MONTANT TOTAL HT (FCFA) :</strong></td>
-                <td class="text-end"><h4 class="text-primary fw-bold">{{ "{:,.0f}".format(total) }}</h4></td>
-            </tr>
-        </tfoot>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Désignation du matériel</th>
+                    <th class="text-center">Qté</th>
+                    <th class="text-end">Prix Unit. (FCFA)</th>
+                    <th class="text-end">Total (FCFA)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mat in materiels %}
+                <tr>
+                    <td>{{ mat.designation }}</td>
+                    <td class="text-center">{{ mat.quantite }}</td>
+                    <td class="text-end">{{ "{:,.0f}".format(mat.prix_unitaire) }}</td>
+                    <td class="text-end fw-bold">{{ "{:,.0f}".format(mat.quantite * mat.prix_unitaire) }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">Aucun article ajouté.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-light">
+                <tr>
+                    <td colspan="3" class="text-end"><strong>MONTANT TOTAL NET À PAYER :</strong></td>
+                    <td class="text-end"><h4 class="text-primary fw-bold mb-0">{{ "{:,.0f}".format(total) }} FCFA</h4></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 
     <div class="row mt-5 d-none d-print-flex text-center">
-        <div class="col-6"><p>Signature Client</p><div style="height:80px; border:1px solid #eee"></div></div>
-        <div class="col-6"><p>Signature Électricien</p><div style="height:80px; border:1px solid #eee"></div></div>
+        <div class="col-6">
+            <p class="mb-5"><strong>Le Client (Bon pour accord)</strong></p>
+            <div style="border: 1px solid #ddd; height: 100px; width: 80%; margin: auto; border-radius: 5px;"></div>
+        </div>
+        <div class="col-6">
+            <p class="mb-5"><strong>L'Entrepreneur (Cachet & Signature)</strong></p>
+            <div style="border: 1px solid #ddd; height: 100px; width: 80%; margin: auto; border-radius: 5px;"></div>
+        </div>
     </div>
 
     <div class="text-end mt-4 d-print-none">
-        <button onclick="window.print()" class="btn btn-dark btn-lg">📥 Télécharger PDF</button>
+        <button onclick="window.print()" class="btn btn-dark btn-lg shadow">
+            📥 Télécharger le Devis PDF
+        </button>
     </div>
 </div>
 {% endblock %}
-                                                           
+    
