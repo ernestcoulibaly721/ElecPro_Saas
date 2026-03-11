@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-5 text-center">
+    <div class="card shadow-lg border-0 p-5">
+        <h1 class="display-4 text-warning">🚀 Test Gratuit Terminé !</h1>
+        <p class="lead mt-3">Vous avez atteint votre limite de <b>3 devis gratuits</b>.</p>
+        <p>Pour continuer à utiliser <b>ÉlecPro</b> en illimité et soutenir le développement de l'outil :</p>
+        
+        <div class="alert alert-info py-4">
+            <h4 class="fw-bold">Abonnement Premium</h4>
+            <p class="fs-2 fw-bold text-primary">2 000 FCFA / mois</p>
+            <hr>
+            <p>Envoyez votre paiement par <b>Orange Money</b> ou <b>Moov Money</b> au :</p>
+            <h3 class="fw-bold">+226 XX XX XX XX</h3>
+            <p class="small text-muted">(Précisez votre nom d'entreprise lors du transfert)</p>
+        </div>
+
+        <div class="mt-4">
+            <a href="https://wa.me/226XXXXXXXX" class="btn btn-success btn-lg">
+                ✅ Envoyer la preuve de paiement sur WhatsApp
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
