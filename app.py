@@ -60,7 +60,24 @@ def ajouter_client():
         return redirect(url_for('index'))
     return render_template('Ajouter_client.html')
 
+# --- LOGIQUE DE LIMITATION À 3 DEVIS ---
+
 @app.route('/creer_devis/<int:client_id>', methods=['GET', 'POST'])
+def creer_devis(client_id):
+    profil = Profil.query.first()
+    client = Client.query.get_or_404(client_id)
+    
+    # Vérification de la limite
+    if profil.devis_count >= 3 and not profil.is_premium:
+        return render_template('upgrade.html') # On le redirige vers une page de paiement
+    
+    if request.method == 'POST':
+        # ... ton code actuel pour ajouter le matériel ...
+        
+        # Si c'est le premier article du devis, on peut incrémenter le compteur
+        # ou on incrémente au moment de la génération du PDF
+        pass
+    ', methods=['GET', 'POST'])
 def creer_devis(client_id):
     client = Client.query.get_or_404(client_id)
     profil = Profil.query.first() or Profil()
