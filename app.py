@@ -1,13 +1,18 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'elecpro_key_2026'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///elecpro_v3.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key_123')
+# On utilise un nom de base de données totalement nouveau pour éviter les anciens conflits
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///final_service.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+# --- TES MODÈLES (Profil, Client, Materiel) ICI ---
+# (Garde les modèles que je t'ai donnés avant)
+
 
 class Profil(db.Model):
     id = db.Column(db.Integer, primary_key=True)
