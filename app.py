@@ -5,8 +5,8 @@ from sqlalchemy import text
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'elecpro_secret_key_2026'
-# Utilisation de SQLite pour le stockage des données
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///elecpro.db'
+# CHANGEMENT ICI : elecpro_v2.db pour forcer la réinitialisation
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///elecpro_v2.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -18,7 +18,6 @@ class Profil(db.Model):
     nom_entreprise = db.Column(db.String(100), default="Mon Entreprise Élec")
     gerant = db.Column(db.String(100), default="Nom du Gérant")
     telephone = db.Column(db.String(20), default="+226 XX XX XX XX")
-    # Nouveaux champs pour la gestion payante (Test 3 devis)
     devis_count = db.Column(db.Integer, default=0)
     is_premium = db.Column(db.Boolean, default=False)
 
@@ -75,7 +74,6 @@ def creer_devis(client_id):
     profil = Profil.query.first()
     client = Client.query.get_or_404(client_id)
     
-    # --- LOGIQUE DE BLOCAGE (TEST GRATUIT LIMITÉ À 3) ---
     if not profil.is_premium and profil.devis_count >= 3:
         return render_template('upgrade.html', profil=profil)
 
@@ -84,7 +82,6 @@ def creer_devis(client_id):
         quantite = int(request.form.get('quantite', 1))
         prix = float(request.form.get('prix_unitaire', 0))
         
-        # Si c'est le tout premier article de ce client, on compte ça comme un nouveau devis
         if not client.materiels:
             profil.devis_count += 1
         
@@ -110,21 +107,10 @@ def supprimer_client(client_id):
     db.session.commit()
     return redirect(url_for('index'))
 
-# --- LANCEMENT ET RÉPARATION AUTO ---
+# --- LANCEMENT ---
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        
-        # Ce bloc force l'ajout des colonnes sur Render si elles manquent
-        with db.engine.connect() as conn:
-            for column in [("devis_count", "INTEGER DEFAULT 0"), ("is_premium", "BOOLEAN DEFAULT 0")]:
-                try:
-                    conn.execute(text(f"ALTER TABLE profil ADD COLUMN {column[0]} {column[1]}"))
-                    conn.commit()
-                    print(f"Colonne {column[0]} ajoutée.")
-                except Exception:
-                    pass 
-
     app.run(debug=True)
-
+    
