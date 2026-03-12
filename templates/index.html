@@ -1,54 +1,34 @@
 {% extends "layout.html" %}
-
 {% block content %}
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card bg-dark text-white p-3 text-center">
-            <h5>Clients Totaux</h5>
-            <h2 class="text-warning">{{ total }}</h2>
+<div class="card p-4 shadow-sm mb-4">
+    <h3>Ajouter un nouveau client / chantier</h3>
+    <form action="/ajouter_client" method="POST" class="row g-3">
+        <div class="col-md-6">
+            <input type="text" name="nom_complet" class="form-control" placeholder="Nom du client" required>
         </div>
-    </div>
-    <div class="col-md-8">
-        <div class="card p-3">
-            <h3>Bienvenue, Ernest ! ⚡</h3>
-            <p class="text-muted">Voici l'état actuel de ton activité commerciale.</p>
+        <div class="col-md-4">
+            <input type="text" name="adresse_chantier" class="form-control" placeholder="Lieu du chantier">
         </div>
-    </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">Ajouter</button>
+        </div>
+    </form>
 </div>
 
-<div class="card p-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3>📂 Liste des Clients</h3>
-        <a href="/ajouter_client" class="btn btn-primary">+ Nouveau Client</a>
+<h3>Mes Devis en cours</h3>
+<div class="list-group">
+    {% for client in clients %}
+    <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0">{{ client.nom_complet }}</h5>
+            <small>{{ client.adresse_chantier }}</small>
+        </div>
+        <div>
+            <a href="/creer_devis/{{ client.id }}" class="btn btn-primary btn-sm">Gérer le devis</a>
+            <a href="/supprimer_client/{{ client.id }}" class="btn btn-danger btn-sm">Supprimer</a>
+        </div>
     </div>
-
-    <table class="table table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Nom / Entreprise</th>
-                <th>Téléphone</th>
-                <th>Adresse du Chantier</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for client in clients %}
-            <tr>
-                <td><strong>{{ client.nom_complet }}</strong></td>
-                <td>{{ client.telephone }}</td>
-                <td>{{ client.adresse_chantier }}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-secondary">Détails</button>
-                    <button class="btn btn-sm btn-outline-warning">Créer Devis</button>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4" class="text-center text-muted">Aucun client pour le moment. Commencez par en ajouter un !</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    {% endfor %}
 </div>
 {% endblock %}
 
