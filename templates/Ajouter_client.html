@@ -1,0 +1,26 @@
+<!{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h2 class="mb-4 text-center">🤝 Nouveau Client</h2>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Nom du Client / Entreprise</label>
+                    <input type="text" name="nom_complet" class="form-control" placeholder="Ex: M. Sawadogo ou Villa Koudougou" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Téléphone</label>
+                    <input type="text" name="telephone" class="form-control" placeholder="+226 ...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Adresse du Chantier</label>
+                    <textarea name="adresse" class="form-control" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Enregistrer dans le CRM</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
