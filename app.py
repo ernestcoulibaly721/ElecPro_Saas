@@ -5,7 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key_123')
 # On utilise un nom de base de données totalement nouveau pour éviter les anciens conflits
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///final_service.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///elecpro_new_v10.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
