@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'elecpro_secret_key_2026'
@@ -17,7 +18,7 @@ class Profil(db.Model):
     nom_entreprise = db.Column(db.String(100), default="Mon Entreprise Élec")
     gerant = db.Column(db.String(100), default="Nom du Gérant")
     telephone = db.Column(db.String(20), default="+226 XX XX XX XX")
-    # Nouveaux champs pour la gestion payante
+    # Nouveaux champs pour la gestion payante (Test 3 devis)
     devis_count = db.Column(db.Integer, default=0)
     is_premium = db.Column(db.Boolean, default=False)
 
@@ -74,8 +75,7 @@ def creer_devis(client_id):
     profil = Profil.query.first()
     client = Client.query.get_or_404(client_id)
     
-    # --- LOGIQUE DE BLOCAGE (TEST GRATUIT) ---
-    # Si l'utilisateur n'est pas premium et a déjà fait 3 devis ou plus
+    # --- LOGIQUE DE BLOCAGE (TEST GRATUIT LIMITÉ À 3) ---
     if not profil.is_premium and profil.devis_count >= 3:
         return render_template('upgrade.html', profil=profil)
 
@@ -109,31 +109,22 @@ def supprimer_client(client_id):
     db.session.delete(client)
     db.session.commit()
     return redirect(url_for('index'))
-# --- LANCEMENT ---
+
+# --- LANCEMENT ET RÉPARATION AUTO ---
 
 if __name__ == '__main__':
     with app.app_context():
-        # Cette partie vérifie et crée les tables si elles n'existent pas
         db.create_all()
         
-        # --- CODE DE SECOURS POUR AJOUTER LES COLONNES MANQUANTES ---
-        try:
-            from sqlalchemy import text
-            with db.engine.connect() as conn:
-                # On essaie d'ajouter les colonnes une par une au cas où elles manqueraient
+        # Ce bloc force l'ajout des colonnes sur Render si elles manquent
+        with db.engine.connect() as conn:
+            for column in [("devis_count", "INTEGER DEFAULT 0"), ("is_premium", "BOOLEAN DEFAULT 0")]:
                 try:
-                    conn.execute(text("ALTER TABLE profil ADD COLUMN devis_count INTEGER DEFAULT 0"))
+                    conn.execute(text(f"ALTER TABLE profil ADD COLUMN {column[0]} {column[1]}"))
                     conn.commit()
-                except:
-                    pass # Déjà là
-                
-                try:
-                    conn.execute(text("ALTER TABLE profil ADD COLUMN is_premium BOOLEAN DEFAULT 0"))
-                    conn.commit()
-                except:
-                    pass # Déjà là
-        except Exception as e:
-            print(f"Note: {e}")
-            
+                    print(f"Colonne {column[0]} ajoutée.")
+                except Exception:
+                    pass 
+
     app.run(debug=True)
-        
+
