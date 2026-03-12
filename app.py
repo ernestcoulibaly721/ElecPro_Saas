@@ -109,11 +109,31 @@ def supprimer_client(client_id):
     db.session.delete(client)
     db.session.commit()
     return redirect(url_for('index'))
-
 # --- LANCEMENT ---
 
 if __name__ == '__main__':
     with app.app_context():
+        # Cette partie vérifie et crée les tables si elles n'existent pas
         db.create_all()
+        
+        # --- CODE DE SECOURS POUR AJOUTER LES COLONNES MANQUANTES ---
+        try:
+            from sqlalchemy import text
+            with db.engine.connect() as conn:
+                # On essaie d'ajouter les colonnes une par une au cas où elles manqueraient
+                try:
+                    conn.execute(text("ALTER TABLE profil ADD COLUMN devis_count INTEGER DEFAULT 0"))
+                    conn.commit()
+                except:
+                    pass # Déjà là
+                
+                try:
+                    conn.execute(text("ALTER TABLE profil ADD COLUMN is_premium BOOLEAN DEFAULT 0"))
+                    conn.commit()
+                except:
+                    pass # Déjà là
+        except Exception as e:
+            print(f"Note: {e}")
+            
     app.run(debug=True)
         
