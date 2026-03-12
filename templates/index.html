@@ -1,1 +1,54 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-dark text-white p-3 text-center">
+            <h5>Clients Totaux</h5>
+            <h2 class="text-warning">{{ total }}</h2>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card p-3">
+            <h3>Bienvenue, Ernest ! ⚡</h3>
+            <p class="text-muted">Voici l'état actuel de ton activité commerciale.</p>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>📂 Liste des Clients</h3>
+        <a href="/ajouter_client" class="btn btn-primary">+ Nouveau Client</a>
+    </div>
+
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Nom / Entreprise</th>
+                <th>Téléphone</th>
+                <th>Adresse du Chantier</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for client in clients %}
+            <tr>
+                <td><strong>{{ client.nom_complet }}</strong></td>
+                <td>{{ client.telephone }}</td>
+                <td>{{ client.adresse_chantier }}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary">Détails</button>
+                    <button class="btn btn-sm btn-outline-warning">Créer Devis</button>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">Aucun client pour le moment. Commencez par en ajouter un !</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
 
